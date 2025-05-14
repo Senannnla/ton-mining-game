@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cyber TON Mining Game</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to right, #1e3a8a, #facc15); /* mavi-sarı fon */
+      background-image: url('https://i.ibb.co/6rbbtRj/roman-helmet.png'),
+                        url('https://i.ibb.co/58JGnH2/dragon-cyber.png');
+      background-repeat: repeat, repeat;
+      background-size: 120px, 200px;
+      color: white;
+      height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    button {
+      background-color: #00ff88;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 16px;
+      color: #000;
+      box-shadow: 0 0 15px #00ff88;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    .chest {
+      width: 160px;
+      margin-bottom: 10px;
+    }
+
+    .balance-display {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <button id="connectWallet">Connect Wallet</button>
+    <button id="balanceBtn">Balance</button>
+  </div>
+
+  <div class="main-content">
+    <div class="chest-section">
+      <img src="https://i.ibb.co/JBsZX6g/chest.png" alt="Chest" class="chest" id="chest">
+      <button id="openChest">Open Chest (0.05 TON)</button>
+    </div>
+
+    <button id="myMiners">My Miners</button>
+    <button id="swapBtn">Swap 100 stones → 0.04 TON</button>
+    <button id="withdrawHistory">Withdrawal History</button>
+
+    <div class="balance-display" id="balanceDisplay">
+      Stones: <span id="stoneAmount">0</span> | TON: <span id="tonAmount">0.000</span>
+    </div>
+  </div>
+
+  <script>
+    let stones = 0;
+    let ton = 0;
+    let miners = [];
+    let equippedMiner = null;
+
+    document.getElementById("connectWallet").onclick = function () {
+      alert("Telegram Wallet permission requested (simulated).");
+    };
+
+    document.getElementById("balanceBtn").onclick = function () {
+      const display = document.getElementById("balanceDisplay");
+      display.style.display = display.style.display === "block" ? "none" : "block";
+    };
+
+    document.getElementById("openChest").onclick = function () {
+      if (ton >= 0.05) {
+        ton -= 0.05;
+        let dailyReward = (Math.random() * (0.005 - 0.002) + 0.002).toFixed(3);
+        miners.push(dailyReward);
+        alert("New processor added! Daily reward: " + dailyReward + " TON");
+        updateBalance();
+      } else {
+        alert("Not enough TON to open chest!");
+      }
+    };
+
+    document.getElementById("myMiners").onclick = function () {
+      if (miners.length === 0) {
+        alert("You have no miners.");
+        return;
+      }
+
+      let list = miners.map((reward, index) => {
+        return `${index + 1}) ${reward} TON/day ${equippedMiner === index ? "(EQUIPPED)" : ""}
+        \n→ Equip: yaz və ${index + 1} yaz`;
+      }).join('\n\n');
+
+      let choice = prompt("Your Miners:\n\n" + list + "\n\nEquip which? (number)");
+      let index = parseInt(choice) - 1;
+      if (!isNaN(index) && miners[index]) {
+        equippedMiner = index;
+        alert("Equipped miner #" + (index + 1));
+      }
+    };
+
+    document.getElementById("swapBtn").onclick = function () {
+      if (stones >= 100) {
+        stones -= 100;
+        ton += 0.04;
+        alert("Swapped 100 stones for 0.04 TON");
+        updateBalance();
+      } else {
+        alert("You need at least 100 stones!");
+      }
+    };
+
+    function updateBalance() {
+      document.getElementById("stoneAmount").textContent = stones;
+      document.getElementById("tonAmount").textContent = ton.toFixed(3);
+    }
+
+    // simulate mining every 5 sec
+    setInterval(() => {
+      if (equippedMiner !== null) {
+        let reward = parseFloat(miners[equippedMiner]);
+        ton += reward / (24 * 60 * 60 / 5); // böl 1 gün saniyəyə və 5 saniyəyə uyğunlaş
+        updateBalance();
+      }
+    }, 5000);
+  </script>
+</body>
+</html>
